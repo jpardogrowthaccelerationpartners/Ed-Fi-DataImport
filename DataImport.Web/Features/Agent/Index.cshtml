@@ -14,19 +14,30 @@ See the LICENSE and NOTICES files in the project root for more information.
 }
 
 <h2>@ViewBag.Title</h2>
-
-<div style="padding-bottom: 10px;">
-    @HtmlHelperService.NavigationButton(Html, "Add Agent", "Add")
+<div class="row">
+	<div class="col-md-9" style="padding-bottom: 10px;">
+		@HtmlHelperService.NavigationButton(Html, "Add Agent", "Add")
+	</div>
+	<div class="col-md-1">
+		<label class="control-label" style="vertical-align:central" for="Enabled">Enabled</label>
+	</div>
+	<div class="col-md-2">
+		<select class="form-control" id="filterValues" style="width:100%">
+			<option value="all">All</option>
+			<option value="true">True</option>
+			<option value="false">False</option>
+		</select>
+	</div>
 </div>
-<table id="tblAgents" class="table table-striped table-hover table-bordered table-responsive" data-paging="true" data-paging-size="20">
+<table id="tblAgents" class="table table-striped table-hover table-bordered table-responsive js-sort-table" data-paging="true" data-paging-size="20">
     <thead>
         <tr>
-            <th>Source</th>
-            <th>Type</th>
-            <th data-type="number">Files</th>
-            <th data-type="number">Run Order</th>
-            <th data-type="date" data-format-string="yyyy-MM-ddTHH:mm:ss">Last Executed</th>
-            <th>Enabled</th>
+			<th data-tooltip="Source">Source</th>
+			<th data-tooltip="Type">Type</th>
+			<th data-type="number" class="js-sort-number" data-tooltip="Files">Files</th>
+			<th data-type="number" class="js-sort-number" data-tooltip="Run Order">Run Order</th>
+			<th data-type="date" class="js-sort-date" data-format-string="yyyy-MM-ddTHH:mm:ss" data-tooltip="Last Executed">Last Executed</th>
+			<th class="filterable" data-tooltip="Enabled">Enabled</th>
             <th class="actions">Actions</th>
         </tr>
     </thead>
