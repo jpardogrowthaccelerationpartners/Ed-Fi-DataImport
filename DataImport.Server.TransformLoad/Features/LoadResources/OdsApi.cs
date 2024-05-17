@@ -5,6 +5,7 @@
 
 using DataImport.Common.ExtensionMethods;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -31,18 +32,29 @@ namespace DataImport.Server.TransformLoad.Features.LoadResources
 
         //HttpClient instances are meant to be long-lived and shared, so we only
         //have separate instances when they would be configured differently.
-        private static readonly HttpClient _unauthenticatedHttpClient = new();
+        private static HttpClient _unauthenticatedHttpClient;
         private readonly ILogger _logger;
+        private readonly IOptions<AppSettings> _options;
 
         private Lazy<HttpClient> AuthenticatedHttpClient { get; set; }
 
         private string AccessToken { get; set; }
 
-        public OdsApi(ILogger logger, ApiConfig config)
+        public OdsApi(ILogger logger, ApiConfig config, IOptions<AppSettings> options)
         {
             _logger = logger;
+            _options = options;
             Config = config;
             AuthenticatedHttpClient = new Lazy<HttpClient>(CreateAuthenticatedHttpClient);
+
+            if (_options.Value.IgnoresCertificateErrors)
+            {
+                _unauthenticatedHttpClient = new HttpClient(IgnoresCertificateErrorsHandler());
+            }
+            else
+            {
+                _unauthenticatedHttpClient = new HttpClient();
+            }
         }
 
         private HttpClient CreateAuthenticatedHttpClient()
@@ -50,7 +62,16 @@ namespace DataImport.Server.TransformLoad.Features.LoadResources
             if (AccessToken == null)
                 throw new Exception("An attempt was made to make authenticated HTTP requests without an Access Token.");
 
-            var httpClient = new HttpClient();
+            HttpClient httpClient;
+            if (_options.Value.IgnoresCertificateErrors)
+            {
+                httpClient = new HttpClient(IgnoresCertificateErrorsHandler());
+            }
+            else
+            {
+                httpClient = new HttpClient();
+            }
+
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", AccessToken);
             return httpClient;
         }
@@ -258,6 +279,19 @@ namespace DataImport.Server.TransformLoad.Features.LoadResources
             var responseContent = await response.Content.ReadAsStringAsync();
 
             return new OdsResponse(response.StatusCode, responseContent);
+        }
+
+        private HttpClientHandler IgnoresCertificateErrorsHandler()
+        {
+            var handler = new HttpClientHandler();
+            handler.ClientCertificateOptions = ClientCertificateOption.Manual;
+            handler.ServerCertificateCustomValidationCallback =
+                (httpRequestMessage, cert, cetChain, policyErrors) =>
+                {
+                    return true;
+                };
+
+            return handler;
         }
     }
 }
