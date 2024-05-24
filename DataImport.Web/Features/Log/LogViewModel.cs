@@ -24,6 +24,10 @@ namespace DataImport.Web.Features.Log
 
         public EdFiHttpStatus HttpStatuses => new EdFiHttpStatus();
 
+        public List<SelectListItem> Tenants = new List<SelectListItem>();
+
+        public List<SelectListItem> Contexts = new List<SelectListItem>();
+
         public Filters LogFilters { get; set; }
 
         public class Filters
@@ -31,6 +35,8 @@ namespace DataImport.Web.Features.Log
             public int SelectedResult { get; set; }
             public int SelectedResponse { get; set; }
             public string Filename { get; set; }
+            public string SelectedTenant { get; set; }
+            public string SelectedContext { get; set; }
         }
 
         public class Ingestion
@@ -46,6 +52,8 @@ namespace DataImport.Web.Features.Log
             public string HttpStatusCode { get; set; }
             public string Data { get; set; }
             public string OdsResponse { get; set; }
+            public string Tenant { get; set; }
+            public string Context { get; set; }
         }
 
         public class File
