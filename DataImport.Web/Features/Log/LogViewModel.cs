@@ -28,6 +28,8 @@ namespace DataImport.Web.Features.Log
 
         public List<SelectListItem> Contexts = new List<SelectListItem>();
 
+        public List<SelectListItem> EducationOrganizationIds = new List<SelectListItem>();
+
         public Filters LogFilters { get; set; }
 
         public class Filters
@@ -37,6 +39,8 @@ namespace DataImport.Web.Features.Log
             public string Filename { get; set; }
             public string SelectedTenant { get; set; }
             public string SelectedContext { get; set; }
+            public int? EducationOrganizationId { get; set; }
+
         }
 
         public class Ingestion
@@ -54,6 +58,7 @@ namespace DataImport.Web.Features.Log
             public string OdsResponse { get; set; }
             public string Tenant { get; set; }
             public string Context { get; set; }
+            public string EducationOrganizationId { get; set; }
         }
 
         public class File

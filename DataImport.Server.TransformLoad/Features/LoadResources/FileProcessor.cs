@@ -25,7 +25,6 @@ using Newtonsoft.Json.Linq;
 using static System.Environment;
 using File = DataImport.Models.File;
 using LogLevels = DataImport.Common.Enums.LogLevel;
-using DataImport.Common.Enums;
 using DataImport.Common.ExtensionMethods;
 
 namespace DataImport.Server.TransformLoad.Features.LoadResources
@@ -382,7 +381,8 @@ namespace DataImport.Server.TransformLoad.Features.LoadResources
                         ApiServerName = file.Agent?.ApiServer?.Name,
                         ApiVersion = file.Agent?.ApiServer?.ApiVersion?.Version.ToString(),
                         FileName = file.FileName,
-                        RowNumber = rowNum
+                        RowNumber = rowNum,
+                        EducationOrganizationId = GetEdOrgId(currentRow, map.SelectedIngestionLogEdOrgIdColumn)
                     };
                     return Task.FromResult((RowResult.Error, new IngestionLogMarker(IngestionResult.Error, LogLevels.Error, rowWithError, $"{odsApi.Config.ApiUrl}{map.ResourcePath}", null, ex.Message)));
                 }
@@ -414,8 +414,21 @@ namespace DataImport.Server.TransformLoad.Features.LoadResources
                     ApiServerName = file.Agent?.ApiServer?.Name,
                     ApiVersion = file.Agent?.ApiServer?.ApiVersion?.Version.ToString(),
                     FileName = file.FileName,
-                    RowNumber = rowNum
+                    RowNumber = rowNum,
+                    EducationOrganizationId = GetEdOrgId(currentRow, dataMap.SelectedIngestionLogEdOrgIdColumn, mappedRowJson)
                 };
+            }
+
+            private int? GetEdOrgId(Dictionary<string, string> currentRow, string selectedIngestionLogEdOrgIdColumn, JToken mappedRowJson = null)
+            {
+                int? edOrgId = null;
+                if (mappedRowJson != null)
+                    edOrgId = Helper.GetEdOrgIdFromJsonTransformed(mappedRowJson);
+
+                if (!edOrgId.HasValue)
+                    edOrgId = Helper.GetEdOrgIdFromCsv(currentRow, selectedIngestionLogEdOrgIdColumn);
+
+                return edOrgId;
             }
 
             private async Task<(RowResult Error, IngestionLogMarker)> PostMappedRow(IOdsApi odsApi, MappedResource mappedRow, string resourcePath)
@@ -591,7 +604,8 @@ namespace DataImport.Server.TransformLoad.Features.LoadResources
                     ApiServerName = marker.MappedResource?.ApiServerName,
                     ApiVersion = marker.MappedResource?.ApiVersion,
                     Tenant = marker.Tenant,
-                    Context = marker.Context
+                    Context = marker.Context,
+                    EducationOrganizationId = marker.MappedResource?.EducationOrganizationId,
                 };
                 _logger.LogToTable($"Writing in IngestionLog for row: {model.RowNumber}", model, "IngestionLog");
             }

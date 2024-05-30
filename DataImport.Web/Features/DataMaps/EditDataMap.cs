@@ -78,7 +78,8 @@ namespace DataImport.Web.Features.DataMaps
                     Preprocessors = _preprocessorSelectListProvider.GetCustomFileProcessors(),
                     Attribute = dataMap.Attribute,
                     IsDeleteOperation = dataMap.IsDeleteOperation,
-                    IsDeleteByNaturalKey = dataMap.IsDeleteByNaturalKey
+                    IsDeleteByNaturalKey = dataMap.IsDeleteByNaturalKey,
+                    SelectedIngestionLogEdOrgIdColumn = dataMap.SelectedIngestionLogEdOrgIdColumn
                 });
             }
         }
@@ -94,6 +95,7 @@ namespace DataImport.Web.Features.DataMaps
             public string Attribute { get; set; }
             public bool IsDeleteOperation { get; set; }
             public bool IsDeleteByNaturalKey { get; set; }
+            public string SelectedIngestionLogEdOrgIdColumn { get; set; }
         }
 
         public class Validator : AbstractValidator<Command>
@@ -153,6 +155,7 @@ namespace DataImport.Web.Features.DataMaps
                 map.Attribute = request.Attribute;
                 map.IsDeleteOperation = request.IsDeleteOperation;
                 map.IsDeleteByNaturalKey = request.IsDeleteOperation && request.IsDeleteByNaturalKey;
+                map.SelectedIngestionLogEdOrgIdColumn = request.SelectedIngestionLogEdOrgIdColumn;
                 _logger.Modified(map, m => m.Name);
 
                 return Task.FromResult(new ToastResponse

@@ -4,6 +4,7 @@ using DataImport.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataImport.Models.Migrations.SqlServer
 {
     [DbContext(typeof(SqlDataImportDbContext))]
-    partial class SqlDataImportDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240524215245_Datamap_Add_SelectedEdOrgIdColumn")]
+    partial class Datamap_Add_SelectedEdOrgIdColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -600,10 +603,6 @@ namespace DataImport.Models.Migrations.SqlServer
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("Context")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
                     b.Property<string>("Data")
                         .HasColumnType("nvarchar(max)");
 
@@ -641,10 +640,6 @@ namespace DataImport.Models.Migrations.SqlServer
 
                     b.Property<string>("RowNumber")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Tenant")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Id");
 

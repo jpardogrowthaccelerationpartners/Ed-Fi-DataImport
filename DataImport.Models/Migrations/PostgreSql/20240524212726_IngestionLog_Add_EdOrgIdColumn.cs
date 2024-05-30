@@ -7,26 +7,18 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DataImport.Models.Migrations.SqlServer
+namespace DataImport.Models.Migrations.PostgreSql
 {
     /// <inheritdoc />
-    public partial class AddsTenantAndContextToIngestionLogs : Migration
+    public partial class IngestionLog_Add_EdOrgIdColumn : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "Context",
+            migrationBuilder.AddColumn<int>(
+                name: "EducationOrganizationId",
                 table: "IngestionLogs",
-                type: "nvarchar(255)",
-                maxLength: 255,
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "Tenant",
-                table: "IngestionLogs",
-                type: "nvarchar(255)",
-                maxLength: 255,
+                type: "integer",
                 nullable: true);
         }
 
@@ -34,11 +26,7 @@ namespace DataImport.Models.Migrations.SqlServer
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Context",
-                table: "IngestionLogs");
-
-            migrationBuilder.DropColumn(
-                name: "Tenant",
+                name: "EducationOrganizationId",
                 table: "IngestionLogs");
         }
     }

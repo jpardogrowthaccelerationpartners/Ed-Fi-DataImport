@@ -267,31 +267,32 @@ See the LICENSE and NOTICES files in the project root for more information.
 
 @if (Model.CsvPreviewDataTable != null)
 {
-<div id="csvPreview">
-    <table id="tblCsvDataPreview" class="table table-striped table-hover table-bordered table-responsive">
-        <thead>
-            <tr>
-                @foreach (DataColumn column in Model.CsvPreviewDataTable.Columns)
+    <div id="csvPreview">
+        <table id="tblCsvDataPreview" class="table table-striped table-hover table-bordered table-responsive">
+            <thead>
+                <tr>
+                    @foreach (DataColumn column in Model.CsvPreviewDataTable.Columns)
+                    {
+                        <th>@column.ColumnName</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (DataRow row in Model.CsvPreviewDataTable.Rows)
                 {
-<th>@column.ColumnName</th>
+                    <tr>
+                        @for (var i = 0; i <= Model.CsvPreviewDataTable.Columns.Count - 1; i++)
+                        {
+                            <td>
+                                @row[i]
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (DataRow row in Model.CsvPreviewDataTable.Rows)
-            {
-<tr>
-    @for (var i = 0; i <= Model.CsvPreviewDataTable.Columns.Count - 1; i++)
-    {
-<td>
-    @row[i]
-</td>
-}
-</tr>
-           }
-        </tbody>
-    </table>
-</div>}
 
 @functions
 { public static string ControllerAction(RouteValueDictionary routeValues)
@@ -306,29 +307,45 @@ See the LICENSE and NOTICES files in the project root for more information.
 {
     using (Html.BeginForm(ControllerAction(Context.Request.RouteValues), "DataMaps", FormMethod.Post, new { @class = "form-horizontal", id = "frmDataMapper" }))
     {
-@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-                @if (Model.IsDeleteOperation && !Model.IsDeleteByNaturalKey)
-                {
-                    <div id="divCSVFields">
-                        @Html.Label("CSV Fields")
-                    </div>
-                    <div id="divModelFields" style="padding: 10px;">
-                        @await Html.PartialAsync("_PartialDataMapperDeleteByIdFields", Model.FieldsViewModel)
-                    </div>
-                                                            
-                }
-                else
-                {
-                    <div id="divCSVFields">
-                        @Html.Label("CSV Fields")
-                    </div>
-                    <div id="divModelFields" style="padding: 10px;">
-                        @await Html.PartialAsync("_PartialDataMapperFields", Model.FieldsViewModel)
-                    </div>
-                }
+        @if (Model.IsDeleteOperation && !Model.IsDeleteByNaturalKey)
+        {
+            <div id="divCSVFields">
+                @Html.Label("CSV Fields")
+            </div>
+            <div id="divModelFields" style="padding: 10px;">
+                @await Html.PartialAsync("_PartialDataMapperDeleteByIdFields", Model.FieldsViewModel)
+            </div>
+
+        }
+        else
+        {
+            <div id="divCSVFields">
+                @Html.Label("CSV Fields")
+            </div>
+            <div id="divModelFields" style="padding: 10px;">
+                @await Html.PartialAsync("_PartialDataMapperFields", Model.FieldsViewModel)
+            </div>
+        }
         @Html.Hidden("ColumnHeaders", JsonConvert.SerializeObject(Model.ColumnHeaders))
-        @Html.SubmitButton("Save Map", new { id = "btnSubmit" })}
+        <fieldset>
+            <div class="form-group">
+                <div class="col-sm-2">
+                    @Html.LabelFor(x => x.SelectedIngestionLogEdOrgIdColumn)
+                </div>
+                <div class="col-sm-10">
+                    @Html.DropDownList("SelectedIngestionLogEdOrgIdColumn", new SelectList(Model.FieldsViewModel.SourceColumns, "Value", "Text", null), new
+                        {
+                            id = "SelectedIngestionLogEdOrgIdColumn",
+                            title = "Select Ingestion Log EdOrgId column",
+                            @class = "form-control map-source-type"
+                        })
+                </div>
+            </div>
+        </fieldset>
+        @Html.SubmitButton("Save Map", new { id = "btnSubmit" })
+    }
 }
 
 @section scripts{
@@ -430,6 +447,7 @@ See the LICENSE and NOTICES files in the project root for more information.
                         attribute: $('#@Html.IdFor(m => m.Attribute)').val(),
                         isDeleteOperation: $('#IsDeleteOperationCheckbox').is(":checked"),
                         isDeleteByNaturalKey: $('#IsDeleteByNaturalKeyRadio').is(":checked"),
+                        selectedIngestionLogEdOrgIdColumn: $('#@Html.IdFor(m => m.SelectedIngestionLogEdOrgIdColumn)').val(),
                         columnHeaders: JSON.parse($('#@Html.IdFor(m => m.ColumnHeaders)').val())
                     };
                     $.ajax({

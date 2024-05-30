@@ -112,6 +112,12 @@ namespace DataImport.Web.Features.Log
                             x.Context.ToLower().Contains(filters.SelectedContext.ToLower()));
                         }
                     }
+
+                    if (filters.EducationOrganizationId.HasValue)
+                    {
+                        logsByDateDesc = (IOrderedQueryable<DataImport.Models.IngestionLog>) logsByDateDesc.Where(x =>
+                            x.EducationOrganizationId == filters.EducationOrganizationId);
+                    }
                 }
                 var pagedList = logsByDateDesc.Skip(offset).Take(limit).ToList();
                 return pagedList.Select(_mapper.Map<LogViewModel.Ingestion>);

@@ -22,13 +22,15 @@ See the LICENSE and NOTICES files in the project root for more information.
 <div class="tab-content">
     <div id="divFiles" class="tab-pane fade in active ajax-content"></div>
     <div id="divLogIngestion" class="tab-pane fade">
-        <div class="row" style=" margin-top: 15px; margin-bottom: 15px ">
+        <div class="row margin-top-bottom-15">
             <div class="col-md-3"><span style="font-weight: bold">Results</span>@Html.DropDownListFor(m => m.Results, Html.GetEnumSelectList(typeof(DataImport.Models.IngestionResult)),"Select Result", new {@class="form-control"})</div>
             <div class="col-md-3"><span style="font-weight: bold">Http Statuses</span>@Html.DropDownListFor(m =>m.HttpStatuses, Html.GetEnumSelectList(typeof(DataImport.Common.Enums.EdFiHttpStatus)), "Select Status", new { @class = "form-control" })</div>
-            <div class="col-md-4"><span style="font-weight: bold">File Name</span>@Html.TextBox("FileName", "", new { @class = "form-control" })</div>
-            <div class="col-md-2"> <button type="button" class="btn btn-primary filterresults" style="margin-top: 20px; float: right">Filter Results</button> </div>
-        </div>
-        <div id="divLogIngestionTenantAndContext" class="row" style=" margin-top: 15px; margin-bottom: 15px ">
+            <div id="divLogIngestionTenantAndContext">
+            </div>
+            <div id="divLogIngestionEdOrgIds">
+            </div>
+            <div class="col-md-6 margin-top-bottom-15"><span style="font-weight: bold">File Name</span>@Html.TextBox("FileName", "", new { @class = "form-control" })</div>
+            <div class="col-md-3 margin-top-bottom-15"> <button type="button" class="btn btn-primary filterresults" style="margin-top: 20px; float: right">Filter Results</button> </div>
         </div>
         <hr/>
         <div id="ingestionLog" class="ajax-content"></div>
@@ -51,11 +53,13 @@ See the LICENSE and NOTICES files in the project root for more information.
                 logFilters.SelectedTenant = $("#TenantDropDown").children("option:selected").val();
                 logFilters.SelectedContext = $("#ContextDropDown").children("option:selected").val();
 
+                logFilters.EducationOrganizationId = $("#EducationOrganizationId").val();
                 return logFilters;
             }
 
             var ingestionLogUrl = "@Url.Action("IngestionLog", "Log", new IngestionLog.Query { PageNumber = 1 })";
             var ingestionLog7xFiltersUrl = "@Url.Action("IngestionLog7xFilters", "Log", new OdsApi7xFilters.Query { })";
+            var ingestionLogEdOrgIdsUrl = "@Url.Action("IngestionLogEdOrgIds", "Log", new EducationOrganizationId.Query { })";
             var filesUrl = "@Html.Raw(Url.Action("FilesLog", "Log", new FilesLog.Query { PageNumber = 1, ApiServerId = Model.ApiServerId }))";
             var logApplicationUrl = "@Url.Action("ApplicationLog", "Log", new ApplicationLog.Query { PageNumber = 1 })";
 
@@ -69,6 +73,18 @@ See the LICENSE and NOTICES files in the project root for more information.
                     dataType: "html",
                     success: function (data) {
                         $("#divLogIngestionTenantAndContext").html(data);
+                    }
+                });
+            }
+
+            function loadIngestionDataEdOrgIds(url) {
+
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    dataType: "html",
+                    success: function (data) {
+                        $("#divLogIngestionEdOrgIds").html(data);
                     }
                 });
             }
@@ -122,6 +138,7 @@ See the LICENSE and NOTICES files in the project root for more information.
                     $("#divFiles").load(filesUrl);
                 } else if (activatedTab === "#divLogIngestion") {
                     loadIngestionData7xFilters(ingestionLog7xFiltersUrl);
+                    loadIngestionDataEdOrgIds(ingestionLogEdOrgIdsUrl);
                     loadIngestionData(ingestionLogUrl);
                 } else if (activatedTab === "#divLogApplication") {
                     $("#divLogApplication").load(logApplicationUrl);

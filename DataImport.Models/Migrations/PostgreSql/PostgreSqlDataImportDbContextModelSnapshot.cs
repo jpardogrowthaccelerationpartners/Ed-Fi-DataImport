@@ -40,6 +40,10 @@ namespace DataImport.Models.Migrations.PostgreSql
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ActionFileCode")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
                     b.Property<string>("AgentAction")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
@@ -418,6 +422,9 @@ namespace DataImport.Models.Migrations.PostgreSql
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<string>("SelectedIngestionLogEdOrgIdColumn")
+                        .HasColumnType("text");
+
                     b.Property<DateTimeOffset?>("UpdateDate")
                         .HasColumnType("timestamp with time zone");
 
@@ -602,8 +609,8 @@ namespace DataImport.Models.Migrations.PostgreSql
                     b.Property<DateTimeOffset>("Date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("EducationOrganizationId")
-                        .HasColumnType("uuid");
+                    b.Property<int?>("EducationOrganizationId")
+                        .HasColumnType("integer");
 
                     b.Property<string>("EndPointUrl")
                         .HasColumnType("text");
