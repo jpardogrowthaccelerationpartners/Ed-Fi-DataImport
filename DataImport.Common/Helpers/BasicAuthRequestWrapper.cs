@@ -4,13 +4,14 @@
 // See the LICENSE and NOTICES files in the project root for more information.
 
 using System;
+using System.Text;
 using DataImport.Models;
 using RestSharp;
 using static DataImport.Common.Encryption;
 
 namespace DataImport.Common.Helpers
 {
-    public class OAuthRequestWrapper : AuthRequestWrapper, IAuthRequestWrapper
+    public class BasicAuthRequestWrapper : AuthRequestWrapper, IAuthRequestWrapper
     {
         public string GetToken(ApiServer apiServer, string encryptionKey)
         {
@@ -22,9 +23,9 @@ namespace DataImport.Common.Helpers
             var tokenUrl = new Uri(apiServer.TokenUrl);
             RestClientOptions options = GetOptions(tokenUrl);
 
-            var oauthClient = new RestClient(options);
+            var authClient = new RestClient(options);
 
-            var bearerTokenRequest = new RestRequest(tokenUrl.AbsolutePath, Method.Post);
+            var tokenRequest = new RestRequest(tokenUrl.AbsolutePath, Method.Post);
 
             var apiServerKey = !string.IsNullOrEmpty(encryptionKey)
                 ? Decrypt(apiServer.Key, encryptionKey)
@@ -33,19 +34,20 @@ namespace DataImport.Common.Helpers
                 ? Decrypt(apiServer.Secret, encryptionKey)
                 : apiServer.Secret;
 
-            bearerTokenRequest.AddParameter("client_id", apiServerKey);
-            bearerTokenRequest.AddParameter("client_secret", apiServerSecret);
+            var keySecretBytes = Encoding.UTF8.GetBytes($"{apiServerKey}:{apiServerSecret}");
+            tokenRequest.AddHeader("Authorization", $"Basic {Convert.ToBase64String(keySecretBytes)}");
+
             if (accessCode != null)
             {
-                bearerTokenRequest.AddParameter("code", accessCode);
-                bearerTokenRequest.AddParameter("grant_type", "authorization_code");
+                tokenRequest.AddParameter("code", accessCode);
+                tokenRequest.AddParameter("grant_type", "authorization_code");
             }
             else
             {
-                bearerTokenRequest.AddParameter("grant_type", "client_credentials");
+                tokenRequest.AddParameter("grant_type", "client_credentials");
             }
 
-            return GetToken(bearerTokenRequest, oauthClient);
+            return GetToken(tokenRequest, authClient);
         }
     }
 }

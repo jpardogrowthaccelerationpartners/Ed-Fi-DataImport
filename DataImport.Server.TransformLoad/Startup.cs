@@ -104,7 +104,11 @@ namespace DataImport.Server.TransformLoad
                 return resolver.Resolve();
             });
             services.AddTransient<IExternalPreprocessorService, ExternalPreprocessorService>();
-            services.AddTransient<IOAuthRequestWrapper, OAuthRequestWrapper>();
+
+            if (bool.Parse(configuration.GetSection("AppSettings")["UseBasicAuthentication"]))
+                services.AddTransient<IAuthRequestWrapper, BasicAuthRequestWrapper>();
+            else
+                services.AddTransient<IAuthRequestWrapper, OAuthRequestWrapper>();
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 
