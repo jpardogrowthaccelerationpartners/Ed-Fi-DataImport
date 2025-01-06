@@ -384,7 +384,7 @@ namespace DataImport.Server.TransformLoad.Features.LoadResources
                         RowNumber = rowNum,
                         EducationOrganizationId = GetEdOrgId(currentRow, map.SelectedIngestionLogEdOrgIdColumn)
                     };
-                    return Task.FromResult((RowResult.Error, new IngestionLogMarker(IngestionResult.Error, LogLevels.Error, rowWithError, $"{odsApi.Config.ApiUrl}{map.ResourcePath}", null, ex.Message)));
+                    return Task.FromResult((RowResult.Error, new IngestionLogMarker(IngestionResult.Error, LogLevels.Error, rowWithError, $"{odsApi.Config.ApiUrl}{map.ResourcePath}", null, null, null, ex.Message)));
                 }
 
                 return mappedRow == null
@@ -450,7 +450,7 @@ namespace DataImport.Server.TransformLoad.Features.LoadResources
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "POST failed for resource: {url}, Row Number: {row}", endpointUrl, mappedRow.RowNumber);
-                    return (RowResult.Error, new IngestionLogMarker(IngestionResult.Error, LogLevels.Error, mappedRow, endpointUrl));
+                    return (RowResult.Error, new IngestionLogMarker(IngestionResult.Error, LogLevels.Error, mappedRow, endpointUrl, null, null, null, ex.Message));
                 }
 
                 switch (odsResponse.StatusCode)
